@@ -17,7 +17,7 @@ fit_unit = np.array(0)
 
 rawLookupDataDict = [row for row in csv.DictReader(open('example_lookup.csv'), ('Voltage', 'A', 'B', 'Unit'))]
 rawLookupData = [row for row in csv.reader(open('example_lookup.csv'))]
-print 'num of observations: ', len(rawLookupData)-1
+#print("num of observations: ", len(rawLookupData)-1)
 
 keyedLookupData = {}
 for row in rawLookupData[1:]:
@@ -27,19 +27,19 @@ for row in rawLookupData[1:]:
 	lookup_unit.append(float(row[3]))
 for row in rawLookupDataDict[1:]:
 	keyedLookupData[row['Voltage']] = row
-#print 'Values for 6V: ', keyedLookupData['6']
+#print("Values for 6V: ", keyedLookupData['6'])
 
-print lookup_voltage
+print(lookup_voltage)
 
 fit_A = return_fit_line(lookup_voltage, lookup_A)
 fit_B = return_fit_line(lookup_voltage, lookup_B)
 fit_unit = return_fit_line(lookup_voltage, lookup_unit)
 
-print "Interpolated value at 2V for B: ", round(fit_B[0]*2 + fit_B[1])
+#print("Interpolated value at 2V for B: ", round(fit_B[0]*2 + fit_B[1]))
 
 with open('example_output.csv', mode = 'w') as output_file:
 	with open('example_field_readings.csv', mode = 'r') as field_values_readonly:
-		output_writer = csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+		output_writer = csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
 		field_values_reader = csv.reader(field_values_readonly, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
 		all = []
