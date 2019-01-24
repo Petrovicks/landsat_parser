@@ -15,7 +15,7 @@ fit_A = np.array(0)
 fit_B = np.array(0)
 fit_unit = np.array(0)
 
-#rawLookupData = [row for row in csv.DictReader(open('example_lookup.csv'), ('Voltage', 'A', 'B', 'Unit'))]
+rawLookupDataDict = [row for row in csv.DictReader(open('example_lookup.csv'), ('Voltage', 'A', 'B', 'Unit'))]
 rawLookupData = [row for row in csv.reader(open('example_lookup.csv'))]
 print 'num of observations: ', len(rawLookupData)-1
 
@@ -25,7 +25,8 @@ for row in rawLookupData[1:]:
 	lookup_A.append(float(row[1]))
 	lookup_B.append(float(row[2]))
 	lookup_unit.append(float(row[3]))
-	#keyedLookupData[row['Voltage']] = row
+for row in rawLookupDataDict[1:]:
+	keyedLookupData[row['Voltage']] = row
 #print 'Values for 6V: ', keyedLookupData['6']
 
 print lookup_voltage
@@ -46,9 +47,15 @@ with open('example_output.csv', mode = 'w') as output_file:
 		row.extend(['A','B', 'Unit'])
 		all.append(row)
 		for row in field_values_reader:
-			row.append(round(float(row[1])*float(fit_A[0])+fit_A[1],2))
-			row.append(round(float(row[1])*float(fit_B[0])+fit_B[1],2))
-			row.append(round(float(row[1])*float(fit_unit[0])+fit_unit[1],2))
+			if row[1] in keyedLookupData:
+				value = keyedLookupData[row[1]]
+				row.append(value['A'])
+				row.append(value['B'])
+				row.append(value['Unit'])
+			else:
+				row.append(round(float(row[1])*float(fit_A[0])+fit_A[1],1))
+				row.append(round(float(row[1])*float(fit_B[0])+fit_B[1],1))
+				row.append(round(float(row[1])*float(fit_unit[0])+fit_unit[1],1))
 			all.append(row)
 
 		output_writer.writerows(all)
