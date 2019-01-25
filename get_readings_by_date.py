@@ -1,4 +1,11 @@
 import csv
+import sys
+
+if sys.version_info[0] < 3:
+	using_python3 = False
+else:
+	using_python3 = True
+	from builtins import input
 
 #reading * 1000000/10521
 MICROVOLTS_SCALING_FACTOR = float(1000000/10521)
@@ -13,7 +20,10 @@ def interpolate(microvolts, channel):
 print("================================")
 print("Parser for Landsat data")
 print("================================")
-output_name = raw_input("\nEnter desired output filename (e.g: specific_readings.csv)\nFilename: ")
+if using_python3:
+	output_name = input("\nEnter desired output filename (e.g: specific_readings.csv)\nFilename: ")
+else:
+	output_name = raw_input("\nEnter desired output filename (e.g: specific_readings.csv)\nFilename: ")
 
 with open (output_name, mode = 'w') as output_file:
 	with open ('field_readings.csv', mode = 'r') as field_readings:
@@ -21,23 +31,31 @@ with open (output_name, mode = 'w') as output_file:
 		field_values = csv.reader(field_readings, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
 		print("\nType 0 to read in desired dates from a csv file.")
-		user_input = raw_input("Type 1 to manually type a single desired reading by date.\nInput: ")
-		output_write.writerow(['Time', 'A (uV)', 'A (C)', 'B (uV)', 'B (C)', 'Thermistor (uV) ?', 'Thermistor (C) ?'])
+		if using_python3:
+			user_input = input("Type 1 to manually type a single desired reading by date.\nInput: ")
+		else:
+			user_input = raw_input("Type 1 to manually type a single desired reading by date.\nInput: ")
 
+		output_write.writerow(['Time', 'A (uV)', 'A (C)', 'B (uV)', 'B (C)', 'Thermistor (uV) ?', 'Thermistor (C) ?'])
 		if user_input == '1':
-			reading_num = raw_input("\nEnter date (YYYY-MM-DD HH:MM:SS): ")
+			if using_python3:
+				reading_num = input("\nEnter date (YYYY-MM-DD HH:MM:SS): ")
+			else:
+				reading_num = raw_input("\nEnter date (YYYY-MM-DD HH:MM:SS): ")
+
 		elif user_input == '0':
-			file_with_dates = raw_input("\nFile with dates (e.g: 'date_list.csv'): ")
+			if using_python3:
+				file_with_dates = input("\nFile with dates (e.g: 'date_list.csv'): ")
+			else:
+				file_with_dates = raw_input("\nFile with dates (e.g: 'date_list.csv'): ")
 			try:
 				with open (file_with_dates, mode = 'r') as dates:
 					date_values = csv.reader(dates, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 					reading_num = []
 					for rows in date_values:
 						reading_num.append(rows[0])
-				print reading_num
 				dates.close()
-			except Exception, e:
-				print("Invalid filename or file format.\n")
+			except Exception as e:
 				raise TypeError(e)
 		else:
 			raise TypeError("Invalid input, exiting..")
@@ -58,6 +76,6 @@ with open (output_name, mode = 'w') as output_file:
 		try:
 			output_write.writerows(everything_to_write)
 			print("Successfully wrote readings to {}".format(output_name))
-		except Exception, e:
+		except Exception as e:
 			print("Error writing to file.\n")
 			raise TypeError(e)
